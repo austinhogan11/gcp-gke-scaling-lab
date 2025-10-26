@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  labels:
+    app: loadgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgen
+  template:
+    metadata:
+      labels:
+        app: loadgen
+    spec:
+      containers:
+        - name: fortio
+          image: fortio/fortio:latest
+          args:
+            - "load"
+            - "-c"
+            - "200"         # concurrency
+            - "-qps"
+            - "0"           # unlimited
+            - "-t"
+            - "0s"          # run indefinitely
+            - "http://demo-nginx-svc.default.svc.cluster.local/"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"

@@ -1,7 +1,7 @@
 # ==========================
 # Terraform
 # ==========================
-# Local .terraform directories
+# Local .terraform directories & lock files
 **/.terraform/*
 .terraform.lock.hcl
 
@@ -20,25 +20,52 @@ terraform.tfvars.json
 *.bak
 *.backup
 
-# Plan output
+# Plan outputs
 plan.out
 *.tfplan
+tfplan.json
 
 # ==========================
 # Kubernetes
 # ==========================
-# kubeconfigs
 .kube/
 *.kubeconfig
-*.yaml~   # temporary editor backups
+*.yaml~
+*.yml~
 
 # ==========================
-# Python / Virtual Env (if used)
+# GitHub Actions / CI-CD
+# ==========================
+# Action runners
+.github/workflows/tmp/
+.github/workflows/.terraform-cache/
+.github/workflows/.terraform/
+.github/workflows/.terraformrc
+
+# Terraform plan output stored as artifacts
+**/tfplan/
+**/terraform-plan.json
+**/terraform-apply.log
+**/terraform-output.txt
+
+# Local workflow testing (act, docker, etc.)
+.act/
+docker-compose.override.yml
+
+# ==========================
+# Python / Virtual Env
 # ==========================
 venv/
 .venv/
 __pycache__/
 *.py[cod]
+
+# ==========================
+# Node / Frontend (if later added)
+# ==========================
+node_modules/
+dist/
+build/
 
 # ==========================
 # OS / Editor Files

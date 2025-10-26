@@ -2,7 +2,7 @@
 
 ## Steps
 
-### Step 1 Set up & Configure GCP
+### 1 Set up & Configure GCP
 1 Account/Project Config
 account = <account>
 project = sr-eng-prep
@@ -25,7 +25,7 @@ gcloud config set account <account>
 gcloud beta billing accounts list
 gcloud beta billing projects describe sr-eng-prep
 
-# Terraform & GCP/GKE Infrastructure Setup
+## 2 Terraform & GCP/GKE Infrastructure Setup
 - Single source of truth for the project infra
 - Managing with TF
     - Project Services/APIs
@@ -65,3 +65,12 @@ gcloud beta billing projects describe sr-eng-prep
         ├── services.tf
         ├── outputs.tf
         └── terraform.tfvars.example
+
+- Create infra with TF
+    cd terraform
+    terraform init
+    terraform plan -var="project_id=sr-eng-prep"
+    terraform apply -auto-approve -var="project_id=sr-eng-prep"
+    terraform output get_credentials_cmd
+    # run the printed command, then:
+    kubectl get nodes

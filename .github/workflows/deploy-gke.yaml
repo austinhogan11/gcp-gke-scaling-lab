@@ -32,7 +32,7 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          IMAGE_URI=us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/syllo-lab-repo/syllo-nginx:${{ github.sha }}
+          IMAGE_URI=us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sr-eng-docker/syllo-nginx:${{ github.sha }}
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV

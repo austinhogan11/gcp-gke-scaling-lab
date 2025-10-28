@@ -10,6 +10,11 @@ concurrency:
   group: deploy-gke-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GKE_CLUSTER: srel-cluster
+  GKE_ZONE: us-east1-b
+  AR_REPO: sr-eng-docker
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -27,18 +32,23 @@ jobs:
           workload_identity_provider: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "github-actions-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
 
-      - name: Configure Docker
+      - name: Configure Docker for AR
         run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
 
       - name: Build & Push Docker Image
         run: |
-          IMAGE_URI=us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sr-eng-docker/syllo-nginx:${{ github.sha }}
+          IMAGE_URI=us-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/syllo-nginx:${{ github.sha }}
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
+      # ✅ This step replaces the manual gcloud get-credentials
       - name: Get GKE Credentials
-        run: gcloud container clusters get-credentials srel-cluster --zone us-east1-b --project ${{ secrets.GCP_PROJECT_ID }}
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
 
       - name: Apply K8s Manifests
         run: |

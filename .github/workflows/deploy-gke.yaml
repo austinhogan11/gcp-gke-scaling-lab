@@ -42,7 +42,6 @@ jobs:
           docker push $IMAGE_URI
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-      # ✅ This step replaces the manual gcloud get-credentials
       - name: Get GKE Credentials
         uses: google-github-actions/get-gke-credentials@v2
         with:
@@ -53,5 +52,8 @@ jobs:
       - name: Apply K8s Manifests
         run: |
           kubectl apply -f k8s/
-          kubectl set image deployment/demo-nginx demo-nginx=$IMAGE_URI
-          kubectl rollout status deployment/demo-nginx
+          # Get the real container name from the deployment
+          CONTAINER=$(kubectl get deploy demo-nginx -o jsonpath='{.spec.template.spec.containers[0].name}')
+          echo "Updating container: $CONTAINER"
+          kubectl set image deploy/demo-nginx $CONTAINER=$IMAGE_URI
+          kubectl rollout status deploy/demo-nginx

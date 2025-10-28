@@ -1,0 +1,11 @@
+# Simple demo app using Nginx
+FROM nginx:stable-alpine
+
+# Copy static HTML (optional, for visibility)
+COPY index.html /usr/share/nginx/html/index.html
+
+# Expose the port
+EXPOSE 80
+
+# Default command
+CMD ["nginx", "-g", "daemon off;"]

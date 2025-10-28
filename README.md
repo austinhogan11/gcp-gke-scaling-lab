@@ -136,3 +136,43 @@ Result
 5. stop the load
 kubectl delete -f k8s/loadgen-fortio.yaml
 
+6. Destroy/Shutdown infra
+terraform destroy -auto-approve     
+
+## Build docker image & deploy app + infra (terraform) with Github Actions CI/CD on repo commit
+
+- Two Github Actions pipelines
+    1. Infrastructure / Terraform Changes
+    2. App / Code Changes / K8s or DockerFiles
+- Auth through WIF (workload Identity federation)
+- triggers based on path so only run if files are changed
+- concurrency in place to avoid overlap
+    - latest commit for code changes
+    - for infra let previous commit run then execute more recent commit
+
+Why split pipelines?
+- single responsibility / clarity
+    - app change
+    - infra change
+- Reduce redundancy / increase speed
+    - don't rebuild/push docker image for only infra changes
+
+
+### Flow
+1. Push code to main (code change, infra change, or both)
+2. GH Actions determines workflow to run
+    1. Terraform / Infrastructure workflow
+        - infra change detected in terraform/
+            - GCP Auth (WIF)
+            - terraform init, plan, apply
+            - infra updated
+    2. App / Code Change 
+        - k8s/ or DockerFile changed
+            - GCP Auth (WIF)
+            - Build Docker Image
+                - push to artifact registry
+            - Get cluster credentials
+            - kubectl apply manifests
+            - kubectl set image
+                - rollout status
+
